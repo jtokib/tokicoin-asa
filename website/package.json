@@ -1,0 +1,26 @@
+{
+  "name": "tokicoin-website",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "TokiCoin (TOKI) - Official website for the Algorand memecoin",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "serve": "vite preview --host"
+  },
+  "keywords": [
+    "tokicoin",
+    "toki",
+    "algorand",
+    "asa",
+    "memecoin",
+    "cryptocurrency"
+  ],
+  "author": "TokiCoin Team",
+  "license": "MIT",
+  "devDependencies": {
+    "vite": "^7.0.4"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "name": "tokicoin-asa",
+  "version": "1.0.0",
+  "description": "TokiCoin (TOKI) - A memecoin built on the Algorand blockchain",
+  "main": "tokicoin.js",
+  "scripts": {
+    "start": "node tokicoin.js",
+    "test": "node test.js",
+    "create-mainnet": "node scripts/create-mainnet.js",
+    "distribute": "node scripts/distribute.js"
+  },
+  "keywords": [
+    "algorand",
+    "asa",
+    "memecoin",
+    "tokicoin",
+    "blockchain",
+    "cryptocurrency"
+  ],
+  "author": "TokiCoin Team",
+  "license": "MIT",
+  "dependencies": {
+    "algosdk": "^2.7.0"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/tokicoin-asa"
+  }
+}
