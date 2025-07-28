@@ -62,6 +62,7 @@ function setupButtons() {
 
 document.querySelector('#app').innerHTML = `
   <div class="header-wrapper">
+    <img src="/TokiCoin Adventures.png" alt="TokiCoin Adventures" class="header-bg">
     <header>
     </header>
   </div>
@@ -168,6 +169,7 @@ document.querySelector('#app').innerHTML = `
   </div>
 
   <div class="footer-wrapper">
+    <img src="/TokiCoin – Fun with Crypto.png" alt="TokiCoin Fun with Crypto" class="footer-bg">
     <footer>
     </footer>
   </div>
