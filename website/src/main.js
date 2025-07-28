@@ -15,7 +15,7 @@ function showCopyNotification(message) {
   notification.className = 'copy-notification show';
   notification.textContent = message;
   document.body.appendChild(notification);
-  
+
   setTimeout(() => {
     notification.remove();
   }, 2000);
@@ -61,13 +61,17 @@ function setupButtons() {
 }
 
 document.querySelector('#app').innerHTML = `
-  <div class="container">
+  <div class="header-wrapper">
     <header>
-      <div class="logo">🪙 TokiCoin</div>
-      <div class="tagline">The Algorand Memecoin</div>
-      <div class="subtitle">Built on Algorand blockchain • ASA Token • Completely Pointless</div>
     </header>
+  </div>
 
+  <div class="container">
+ <div class="subtitle">
+          <span class="badge blue">Algorand</span>
+          <span class="badge green">ASA Token</span>
+          <span class="badge orange">Memecoin</span>
+        </div>
     <div class="stats">
       <div class="stat-card">
         <div class="stat-value">20M</div>
@@ -150,8 +154,8 @@ document.querySelector('#app').innerHTML = `
 
     <div class="buttons">
       <button id="add-to-wallet" class="button">Add to Wallet</button>
-      <button id="view-explorer" class="button">View on Explorer</button>
-      <a href="https://github.com/your-username/tokicoin-asa" class="button" target="_blank">GitHub</a>
+      <button id="view-explorer" class="button secondary">View on Explorer</button>
+      <a href="https://github.com/jtokib/tokicoin-asa" class="button secondary" target="_blank">GitHub</a>
     </div>
 
     <div class="section">
@@ -161,10 +165,15 @@ document.querySelector('#app').innerHTML = `
       <p><strong>Step 3:</strong> Ask a friend who has TOKI to send you some, or contact the creator</p>
       <p><strong>Step 4:</strong> Share the pointless joy with others!</p>
     </div>
+  </div>
 
+  <div class="footer-wrapper">
     <footer>
-      <p>&copy; 2025 TokiCoin • Built with ❤️ on Algorand • Completely Pointless by Design</p>
     </footer>
+  </div>
+  
+  <div class="container">
+      <p>&copy; 2025 TokiCoin • Built with ❤️ on Algorand • Completely Pointless by Design</p>
   </div>
 `
 

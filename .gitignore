@@ -83,3 +83,5 @@ mainnet-*.js
 # Backup files
 *.bak
 *.backup
+# Local Netlify folder
+.netlify
