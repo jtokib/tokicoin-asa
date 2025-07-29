@@ -1,4 +1,4 @@
-const { AlgorandClient, Config, microAlgos } = require('@algorandfoundation/algokit-utils');
+const { AlgorandClient } = require('@algorandfoundation/algokit-utils');
 const algosdk = require('algosdk');
 
 // TokiCoin (TOKI) ASA Creation Script
@@ -11,9 +11,9 @@ class TokiCoinASA {
         
         // Initialize AlgorandClient with modern AlgoKit patterns
         if (network === 'testnet') {
-            this.algorand = AlgorandClient.testnet();
+            this.algorand = AlgorandClient.testNet();
         } else if (network === 'mainnet') {
-            this.algorand = AlgorandClient.mainnet();
+            this.algorand = AlgorandClient.mainNet();
         } else {
             throw new Error('Invalid network. Use "testnet" or "mainnet"');
         }
@@ -41,17 +41,19 @@ class TokiCoinASA {
                 throw new Error('Invalid mnemonic provided');
             }
             
-            // Recover creator account from mnemonic
+            // Recover creator account from mnemonic and create AlgoKit signer
             const creatorAccount = algosdk.mnemonicToSecretKey(creatorMnemonic);
-            console.log('Creator Address:', creatorAccount.addr.substring(0, 8) + '...');
-
-            // Set the account in AlgoKit client
-            this.algorand.setDefaultSigner(creatorAccount);
+            console.log('Creator Address:', creatorAccount.addr);
+            
+            // Create signer function for AlgoKit
+            const signer = (txnGroup) => {
+                return txnGroup.map(txn => txn.signTxn(creatorAccount.sk));
+            };
 
             // Create ASA using AlgoKit's simplified interface
             const result = await this.algorand.send.assetCreate({
                 sender: creatorAccount.addr,
-                total: BigInt(this.asaParams.total),
+                total: BigInt(this.asaParams.total * Math.pow(10, this.asaParams.decimals)),
                 decimals: this.asaParams.decimals,
                 defaultFrozen: this.asaParams.defaultFrozen,
                 manager: creatorAccount.addr,
@@ -61,7 +63,8 @@ class TokiCoinASA {
                 unitName: this.asaParams.unitName,
                 assetName: this.asaParams.assetName,
                 url: this.asaParams.assetURL,
-                metadataHash: this.asaParams.assetMetadataHash
+                metadataHash: this.asaParams.assetMetadataHash,
+                signer: signer
             });
 
             console.log('TokiCoin ASA created successfully!');
@@ -96,11 +99,16 @@ class TokiCoinASA {
         try {
             const account = algosdk.mnemonicToSecretKey(accountMnemonic);
             
+            // Create signer function for AlgoKit
+            const signer = (txnGroup) => {
+                return txnGroup.map(txn => txn.signTxn(account.sk));
+            };
+
             // Use AlgoKit's simplified asset opt-in
             const result = await this.algorand.send.assetOptIn({
                 sender: account.addr,
                 assetId: assetId,
-                signer: account
+                signer: signer
             });
 
             console.log('Successfully opted in to ASA:', assetId);
@@ -127,11 +135,16 @@ class TokiCoinASA {
             
             // Check sender balance using AlgoKit
             const accountInfo = await this.algorand.client.algod.accountInformation(fromAccount.addr).do();
-            const assetHolding = accountInfo.assets.find(asset => asset['asset-id'] === assetId);
+            const assetHolding = accountInfo.assets.find(asset => Number(asset.assetId) === assetId || asset['asset-id'] === assetId);
             
             if (!assetHolding || assetHolding.amount < amount) {
                 throw new Error('Insufficient balance for transfer');
             }
+
+            // Create signer function for AlgoKit
+            const signer = (txnGroup) => {
+                return txnGroup.map(txn => txn.signTxn(fromAccount.sk));
+            };
 
             // Use AlgoKit's simplified asset transfer
             const result = await this.algorand.send.assetTransfer({
@@ -139,7 +152,7 @@ class TokiCoinASA {
                 receiver: toAddress,
                 assetId: assetId,
                 amount: BigInt(amount),
-                signer: fromAccount
+                signer: signer
             });
 
             console.log(`Successfully transferred ${amount} TOKI to ${toAddress}`);
@@ -167,28 +180,29 @@ class TokiCoinASA {
 async function main() {
     const tokiCoin = new TokiCoinASA('testnet'); // Use 'mainnet' for production
 
-    // Generate new account for testing (save this mnemonic securely!)
-    const newAccount = tokiCoin.generateNewAccount();
-    console.log('New account generated:');
-    console.log('Address:', newAccount.address);
-    console.log('Mnemonic:', newAccount.mnemonic);
-    console.log('⚠️  SAVE THIS MNEMONIC SECURELY! ⚠️');
-
-    // Fund the account with testnet ALGOs from: https://bank.testnet.algorand.network/
-    console.log('\n📝 Next steps:');
-    console.log('1. Fund your account with testnet ALGOs');
-    console.log('2. Uncomment the createASA call below');
-    console.log('3. Run the script again to create your ASA');
-
-    // Uncomment to create ASA (ensure account is funded first)
-    /*
-    try {
-        const result = await tokiCoin.createASA(newAccount.mnemonic);
-        console.log('TokiCoin created:', result);
-    } catch (error) {
-        console.error('Failed to create TokiCoin:', error);
+    // Use existing mnemonic from environment
+    require('dotenv').config({ path: '.env.local' });
+    const existingMnemonic = process.env.CREATOR_MNEMONIC;
+    
+    if (!existingMnemonic) {
+        console.error('❌ No CREATOR_MNEMONIC found in .env.local');
+        return;
     }
-    */
+    
+    console.log('🚀 Creating new TokiCoin ASA with existing mnemonic...');
+    
+    try {
+        const result = await tokiCoin.createASA(existingMnemonic);
+        console.log('✅ TokiCoin created successfully!');
+        console.log('📊 New Asset ID:', result.assetId);
+        console.log('📄 Transaction ID:', result.txId);
+        console.log('🔗 View on AlgoExplorer:');
+        console.log(`https://testnet.explorer.perawallet.app/tx/${result.txId}`);
+        console.log('\n📝 Update your .env.local with the new Asset ID:', result.assetId);
+    } catch (error) {
+        console.error('❌ Failed to create TokiCoin:', error.message);
+    }
+    
 }
 
 // Export for use in other scripts

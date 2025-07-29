@@ -10,17 +10,27 @@ TokiCoin (TOKI) is a professionally developed memecoin built on the Algorand blo
 ```
 tokicoin-asa/
 ├── .gitignore                   # Comprehensive security exclusions
-├── .env.example                 # Environment variable template
-├── package.json                 # Root dependencies (Algorand SDK)
+├── .env.example                 # Environment variable template (removed)
+├── package.json                 # Root dependencies (AlgoKit Utils & Algorand SDK v3+)
 ├── README.md                   # Complete documentation
-├── claude.md                   # Project summary (this file)
+├── CLAUDE.md                   # Project summary (this file)
+├── SECURITY_AUDIT.md           # Security review documentation
 ├── scripts/
-│   ├── tokicoin.js            # Secure ASA creation & management
-│   ├── distrbute.js           # Intelligent batch distribution
-│   └── test.js               # Testing utilities
+│   ├── README.md              # Scripts documentation
+│   ├── core/                  # Core ASA operations
+│   │   ├── tokicoin.js       # Secure ASA creation & management (AlgoKit v9+)
+│   │   └── distrbute.js      # Intelligent batch distribution
+│   ├── test/                  # Testing scripts
+│   │   ├── test-transfer.js  # Transfer testing and validation
+│   │   └── test.js           # General testing utilities
+│   └── tools/                 # Utility and diagnostic tools
+│       ├── check-account.js  # Account balance and ASA checker
+│       ├── check-asa.js      # ASA information verification
+│       ├── generate-recipient.js # Account generation tool
+│       └── opt-in-recipient.js # ASA opt-in utility
 └── website/                   # Modern Vite website
     ├── .gitignore            # Website-specific exclusions
-    ├── .env.example          # Website environment template
+    ├── .env.example          # Website environment template (removed)
     ├── package.json          # Vite & website dependencies
     ├── netlify.toml          # Netlify deployment config
     ├── index.html            # SEO-optimized HTML
@@ -86,9 +96,10 @@ VITE_EXPLORER_URL=       # Algorand explorer URL
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build
-- `node scripts/tokicoin.js` - Create ASA on blockchain (AlgoKit pattern)
-- `npm run distribute` - Distribute tokens
-- `npm run test` - Run tests
+- `node scripts/core/tokicoin.js` - Create ASA on blockchain (AlgoKit pattern)
+- `node scripts/core/distrbute.js` - Distribute tokens to multiple addresses
+- `node scripts/test/test-transfer.js` - Test token transfers
+- `node scripts/tools/check-account.js` - Check account balances
 
 ## Prerequisites (Always Required)
 - **Node.js**: v22.0.0 or higher
@@ -132,7 +143,14 @@ For technical issues:
 
 ## 🔄 Development Workflow (AlgoKit Pattern)
 1. **Install modern dependencies**: `npm install`
-2. **Generate account**: `node scripts/tokicoin.js`
+2. **Generate account & create ASA**: `node scripts/core/tokicoin.js`
 3. **Fund account**: Visit [bank.testnet.algorand.network](https://bank.testnet.algorand.network/)
-4. **Create ASA**: Uncomment creation code and run `node scripts/tokicoin.js`
-5. **Deploy website**: Use Asset ID in Vite environment variables
+4. **Update .env.local**: Add creator mnemonic and run creation script again
+5. **Test transfers**: `node scripts/test/test-transfer.js`
+6. **Check balances**: `node scripts/tools/check-account.js`
+7. **Deploy website**: Use Asset ID in Vite environment variables
+
+## 📁 Script Organization
+- **`/core`**: Core ASA operations (creation, distribution)
+- **`/test`**: Testing and validation scripts
+- **`/tools`**: Utility scripts for checking balances, generating accounts, etc.

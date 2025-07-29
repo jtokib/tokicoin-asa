@@ -4,7 +4,8 @@
       "Bash(del vercel.json)",
       "Bash(rm:*)",
       "Bash(npm run build:*)",
-      "WebFetch(domain:dev.algorand.co)"
+      "WebFetch(domain:dev.algorand.co)",
+      "Bash(node:*)"
     ],
     "deny": []
   }
