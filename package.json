@@ -20,13 +20,15 @@
   "author": "TokiCoin Team",
   "license": "MIT",
   "dependencies": {
-    "algosdk": "^2.7.0"
+    "algosdk": "^3.3.1",
+    "@algorandfoundation/algokit-utils": "^9.1.2"
   },
   "devDependencies": {
     "jest": "^29.0.0"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=22.0.0",
+    "npm": ">=10.0.0"
   },
   "repository": {
     "type": "git",

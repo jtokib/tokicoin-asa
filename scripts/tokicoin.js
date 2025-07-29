@@ -1,25 +1,21 @@
+const { AlgorandClient, Config, microAlgos } = require('@algorandfoundation/algokit-utils');
 const algosdk = require('algosdk');
 
 // TokiCoin (TOKI) ASA Creation Script
-// This script creates the TokiCoin ASA on Algorand blockchain
+// This script creates the TokiCoin ASA on Algorand blockchain using AlgoKit
 
 class TokiCoinASA {
     constructor(network = 'testnet') {
-        // Network configuration
+        // Network configuration using AlgoKit
         this.network = network;
-
+        
+        // Initialize AlgorandClient with modern AlgoKit patterns
         if (network === 'testnet') {
-            this.algodClient = new algosdk.Algodv2(
-                '',
-                'https://testnet-api.algonode.cloud',
-                ''
-            );
+            this.algorand = AlgorandClient.testnet();
         } else if (network === 'mainnet') {
-            this.algodClient = new algosdk.Algodv2(
-                '',
-                'https://mainnet-api.algonode.cloud',
-                ''
-            );
+            this.algorand = AlgorandClient.mainnet();
+        } else {
+            throw new Error('Invalid network. Use "testnet" or "mainnet"');
         }
 
         // TokiCoin ASA Parameters
@@ -49,51 +45,32 @@ class TokiCoinASA {
             const creatorAccount = algosdk.mnemonicToSecretKey(creatorMnemonic);
             console.log('Creator Address:', creatorAccount.addr.substring(0, 8) + '...');
 
-            // Set creator as manager, reserve, freeze, and clawback
-            this.asaParams.manager = creatorAccount.addr;
-            this.asaParams.reserve = creatorAccount.addr;
-            this.asaParams.freeze = creatorAccount.addr;
-            this.asaParams.clawback = creatorAccount.addr;
+            // Set the account in AlgoKit client
+            this.algorand.setDefaultSigner(creatorAccount);
 
-            // Get network parameters
-            const suggestedParams = await this.algodClient.getTransactionParams().do();
-
-            // Create asset creation transaction
-            const txn = algosdk.makeAssetCreateTxnWithSuggestedParams(
-                creatorAccount.addr,
-                undefined, // note
-                this.asaParams.total,
-                this.asaParams.decimals,
-                this.asaParams.defaultFrozen,
-                this.asaParams.manager,
-                this.asaParams.reserve,
-                this.asaParams.freeze,
-                this.asaParams.clawback,
-                this.asaParams.unitName,
-                this.asaParams.assetName,
-                this.asaParams.assetURL,
-                this.asaParams.assetMetadataHash,
-                suggestedParams
-            );
-
-            // Sign the transaction
-            const signedTxn = txn.signTxn(creatorAccount.sk);
-
-            // Submit to network
-            const { txId } = await this.algodClient.sendRawTransaction(signedTxn).do();
-            console.log('Asset creation transaction sent. TxID:', txId);
-
-            // Wait for confirmation
-            const confirmedTxn = await this.waitForConfirmation(txId);
-            const assetId = confirmedTxn['asset-index'];
+            // Create ASA using AlgoKit's simplified interface
+            const result = await this.algorand.send.assetCreate({
+                sender: creatorAccount.addr,
+                total: BigInt(this.asaParams.total),
+                decimals: this.asaParams.decimals,
+                defaultFrozen: this.asaParams.defaultFrozen,
+                manager: creatorAccount.addr,
+                reserve: creatorAccount.addr,
+                freeze: creatorAccount.addr,
+                clawback: creatorAccount.addr,
+                unitName: this.asaParams.unitName,
+                assetName: this.asaParams.assetName,
+                url: this.asaParams.assetURL,
+                metadataHash: this.asaParams.assetMetadataHash
+            });
 
             console.log('TokiCoin ASA created successfully!');
-            console.log('Asset ID:', assetId);
-            console.log('Transaction ID:', txId);
+            console.log('Asset ID:', result.confirmation.assetIndex);
+            console.log('Transaction ID:', result.txIds[0]);
 
             return {
-                assetId,
-                txId,
+                assetId: result.confirmation.assetIndex,
+                txId: result.txIds[0],
                 creatorAddress: creatorAccount.addr
             };
 
@@ -103,21 +80,11 @@ class TokiCoinASA {
         }
     }
 
-    async waitForConfirmation(txId) {
-        let lastRound = (await this.algodClient.status().do())['last-round'];
-        while (true) {
-            const pendingInfo = await this.algodClient.pendingTransactionInformation(txId).do();
-            if (pendingInfo['confirmed-round'] !== null && pendingInfo['confirmed-round'] > 0) {
-                return pendingInfo;
-            }
-            lastRound++;
-            await this.algodClient.statusAfterBlock(lastRound).do();
-        }
-    }
+    // AlgoKit handles transaction confirmation automatically
 
     async getASAInfo(assetId) {
         try {
-            const assetInfo = await this.algodClient.getAssetByID(assetId).do();
+            const assetInfo = await this.algorand.client.algod.getAssetByID(assetId).do();
             return assetInfo;
         } catch (error) {
             console.error('Error getting ASA info:', error);
@@ -128,25 +95,16 @@ class TokiCoinASA {
     async optInToASA(assetId, accountMnemonic) {
         try {
             const account = algosdk.mnemonicToSecretKey(accountMnemonic);
-            const suggestedParams = await this.algodClient.getTransactionParams().do();
+            
+            // Use AlgoKit's simplified asset opt-in
+            const result = await this.algorand.send.assetOptIn({
+                sender: account.addr,
+                assetId: assetId,
+                signer: account
+            });
 
-            const txn = algosdk.makeAssetTransferTxnWithSuggestedParams(
-                account.addr,
-                account.addr,
-                undefined, // closeRemainderTo
-                undefined, // revocationTarget
-                0, // amount (0 for opt-in)
-                undefined, // note
-                assetId,
-                suggestedParams
-            );
-
-            const signedTxn = txn.signTxn(account.sk);
-            const { txId } = await this.algodClient.sendRawTransaction(signedTxn).do();
-
-            await this.waitForConfirmation(txId);
             console.log('Successfully opted in to ASA:', assetId);
-            return txId;
+            return result.txIds[0];
 
         } catch (error) {
             console.error('Error opting in to ASA:', error);
@@ -167,32 +125,25 @@ class TokiCoinASA {
             
             const fromAccount = algosdk.mnemonicToSecretKey(fromMnemonic);
             
-            // Check sender balance
-            const accountInfo = await this.algodClient.accountInformation(fromAccount.addr).do();
+            // Check sender balance using AlgoKit
+            const accountInfo = await this.algorand.client.algod.accountInformation(fromAccount.addr).do();
             const assetHolding = accountInfo.assets.find(asset => asset['asset-id'] === assetId);
             
             if (!assetHolding || assetHolding.amount < amount) {
                 throw new Error('Insufficient balance for transfer');
             }
-            const suggestedParams = await this.algodClient.getTransactionParams().do();
 
-            const txn = algosdk.makeAssetTransferTxnWithSuggestedParams(
-                fromAccount.addr,
-                toAddress,
-                undefined, // closeRemainderTo
-                undefined, // revocationTarget
-                amount,
-                undefined, // note
-                assetId,
-                suggestedParams
-            );
+            // Use AlgoKit's simplified asset transfer
+            const result = await this.algorand.send.assetTransfer({
+                sender: fromAccount.addr,
+                receiver: toAddress,
+                assetId: assetId,
+                amount: BigInt(amount),
+                signer: fromAccount
+            });
 
-            const signedTxn = txn.signTxn(fromAccount.sk);
-            const { txId } = await this.algodClient.sendRawTransaction(signedTxn).do();
-
-            await this.waitForConfirmation(txId);
             console.log(`Successfully transferred ${amount} TOKI to ${toAddress}`);
-            return txId;
+            return result.txIds[0];
 
         } catch (error) {
             console.error('Error transferring ASA:', error);
@@ -223,7 +174,7 @@ async function main() {
     console.log('Mnemonic:', newAccount.mnemonic);
     console.log('⚠️  SAVE THIS MNEMONIC SECURELY! ⚠️');
 
-    // Fund the account with testnet ALGOs from: https://testnet.algoexplorer.io/dispenser
+    // Fund the account with testnet ALGOs from: https://bank.testnet.algorand.network/
     console.log('\n📝 Next steps:');
     console.log('1. Fund your account with testnet ALGOs');
     console.log('2. Uncomment the createASA call below');
