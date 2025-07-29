@@ -20,13 +20,14 @@ class TokiDistributor {
         }
         
         // Check creator balance before starting
+        const algosdk = require('algosdk');
         const creatorAccount = algosdk.mnemonicToSecretKey(creatorMnemonic);
         const totalAmount = recipients.reduce((sum, r) => sum + r.amount, 0);
         
-        const accountInfo = await this.tokiCoin.algodClient.accountInformation(creatorAccount.addr).do();
-        const assetHolding = accountInfo.assets.find(asset => asset['asset-id'] === assetId);
+        const accountInfo = await this.tokiCoin.algorand.client.algod.accountInformation(creatorAccount.addr).do();
+        const assetHolding = accountInfo.assets.find(asset => asset.assetId === BigInt(assetId));
         
-        if (!assetHolding || assetHolding.amount < totalAmount) {
+        if (!assetHolding || Number(assetHolding.amount) < totalAmount) {
             throw new Error(`Insufficient balance. Need ${totalAmount}, have ${assetHolding?.amount || 0}`);
         }
         
@@ -103,8 +104,8 @@ class TokiDistributor {
 
         for (const address of addresses) {
             try {
-                const accountInfo = await this.tokiCoin.algodClient.accountInformation(address).do();
-                const hasOptedIn = accountInfo.assets.some(asset => asset['asset-id'] === assetId);
+                const accountInfo = await this.tokiCoin.algorand.client.algod.accountInformation(address).do();
+                const hasOptedIn = accountInfo.assets.some(asset => asset.assetId === BigInt(assetId));
 
                 console.log(`${address}: ${hasOptedIn ? '✅ Opted in' : '❌ Not opted in'}`);
             } catch (error) {
@@ -136,7 +137,7 @@ async function main() {
     // Configuration - UPDATE THESE VALUES
     const CONFIG = {
         network: 'testnet', // Change to 'mainnet' for production
-        assetId: 0, // Replace with your actual Asset ID
+        assetId: 743521125, // Your TokiCoin Asset ID
         creatorMnemonic: process.env.CREATOR_MNEMONIC || 'YOUR_CREATOR_MNEMONIC_HERE', // Use environment variable
     };
 

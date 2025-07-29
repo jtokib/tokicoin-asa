@@ -1,4 +1,4 @@
-const { TokiCoinASA } = require('./tokicoin.js');
+const { TokiCoinASA } = require('../core/tokicoin.js');
 
 async function test() {
     const tokiCoin = new TokiCoinASA('testnet');

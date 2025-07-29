@@ -70,6 +70,9 @@ jspm_packages/
 *wallet*
 *.key
 *.pem
+*-test.js
+test-*.js
+TESTING_*.md
 
 # Algorand specific
 account-info.json
@@ -79,6 +82,8 @@ creator-account.json
 # Test files with real data
 test-mainnet.js
 mainnet-*.js
+*test-distribution*
+*test-asa*
 
 # Backup files
 *.bak

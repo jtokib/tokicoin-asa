@@ -23,8 +23,10 @@ TokiCoin is a memecoin created purely for fun and to share with friends. It has 
 
 ### Prerequisites
 
-- Node.js 16.0.0 or higher
-- npm or yarn
+- Node.js 22.0.0 or higher
+- npm 10.0.0 or higher
+- AlgoKit Utils v9.1.2+ (automatically installs with `npm install`)
+- Algorand SDK v3.3.1+ (automatically installs with `npm install`)
 - Algorand wallet with ALGO for transaction fees
 - Basic understanding of blockchain transactions
 
@@ -60,20 +62,17 @@ cp .env.example .env.local
 
 ### Creating the ASA on Testnet
 
-1. Run the script to generate a new account:
+1. Generate a new account and create ASA:
 ```bash
-node tokicoin.js
+node scripts/core/tokicoin.js
 ```
 
 2. Fund the generated account with testnet ALGOs:
-   - Visit [Algorand Testnet Dispenser](https://testnet.algoexplorer.io/dispenser)
+   - Visit [Algorand Testnet Dispenser](https://bank.testnet.algorand.network/)
    - Enter your account address
    - Request testnet ALGOs
 
-3. Uncomment the `createASA` call in `tokicoin.js` and run again:
-```bash
-node tokicoin.js
-```
+3. Update .env.local with your mnemonic and run creation script again
 
 ### Creating the ASA on Mainnet
 
@@ -83,38 +82,35 @@ node tokicoin.js
 2. Use a funded mainnet account
 3. Run the creation script
 
-### Distribution Script
+### Token Distribution
 
-```javascript
-const { TokiCoinASA } = require('./tokicoin.js');
+Use the batch distribution script for multiple recipients:
 
-async function distribute() {
-    const tokiCoin = new TokiCoinASA('mainnet');
-    const assetId = 'YOUR_ASSET_ID'; // Replace with actual asset ID
-    
-    // List of friends to send TOKI to
-    const recipients = [
-        { address: 'FRIEND1_ADDRESS', amount: 1000000 }, // 1 TOKI
-        { address: 'FRIEND2_ADDRESS', amount: 1000000 }, // 1 TOKI
-        // Add more friends...
-    ];
-    
-    for (const recipient of recipients) {
-        try {
-            await tokiCoin.transferASA(
-                assetId,
-                'YOUR_CREATOR_MNEMONIC',
-                recipient.address,
-                recipient.amount
-            );
-            console.log(`Sent ${recipient.amount} TOKI to ${recipient.address}`);
-        } catch (error) {
-            console.error(`Failed to send to ${recipient.address}:`, error);
-        }
-    }
-}
+```bash
+node scripts/core/distrbute.js
+```
 
-distribute();
+### Testing Transfers
+
+Test single token transfers:
+
+```bash
+node scripts/test/test-transfer.js
+```
+
+### Utility Scripts
+
+Check account balances and ASA information:
+
+```bash
+# Check account balance
+node scripts/tools/check-account.js
+
+# Check ASA information
+node scripts/tools/check-asa.js
+
+# Generate new recipient account
+node scripts/tools/generate-recipient.js
 ```
 
 ## API Reference
@@ -180,12 +176,20 @@ Generates a new Algorand account.
 - **Network Separation**: Mainnet files are blocked from accidental commits
 
 ### 🛡️ Best Practices
-1. **Never store mnemonics in code** - Use environment variables only
+1. **NEVER store mnemonics in code** - Use environment variables only
 2. **Test on testnet first** - Always validate functionality before mainnet
 3. **Use environment variables** - Keep all configuration in `.env.local`
 4. **Verify recipients** - Ensure recipients have opted-in before transfers
 5. **Check balances** - Validate sufficient funds before transactions
 6. **Backup safely** - Store mnemonics securely offline, never in digital files
+7. **Remove test files** - Delete any scripts with real addresses/mnemonics
+8. **Check git status** - Ensure no sensitive files are staged for commit
+
+### 🚨 CRITICAL Security Reminders
+- Run `git status` before every commit to check for sensitive files
+- Use `export CREATOR_MNEMONIC="..."` for temporary environment variables
+- Delete test files with real data after use
+- Never commit files ending in `*-test.js`, `test-*.js`, or `TESTING_*.md`
 
 ## Deployment Steps
 
@@ -211,10 +215,20 @@ Generates a new Algorand account.
 tokicoin-asa/
 ├── package.json                # Node.js dependencies
 ├── README.md                   # This file  
+├── CLAUDE.md                   # Project instructions and status
+├── SECURITY_AUDIT.md           # Security review documentation
 ├── scripts/
-│   ├── tokicoin.js            # Main ASA creation script
-│   ├── distrbute.js           # Token distribution script  
-│   └── test.js                # Test script
+│   ├── README.md              # Scripts documentation
+│   ├── core/                  # Core ASA operations
+│   │   ├── tokicoin.js       # Main TokiCoinASA class
+│   │   └── distrbute.js      # Batch distribution script
+│   ├── test/                  # Testing scripts
+│   │   ├── test-transfer.js  # Transfer testing
+│   │   └── test.js           # General testing utilities
+│   └── tools/                 # Utility scripts
+│       ├── check-account.js  # Account balance checker
+│       ├── check-asa.js      # ASA information checker
+│       └── generate-recipient.js # Account generator
 └── website/                   # Modern Vite website
     ├── index.html             # Main HTML file with SEO meta tags
     ├── package.json           # Website dependencies
