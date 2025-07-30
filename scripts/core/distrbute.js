@@ -4,7 +4,13 @@ const { TokiCoinASA } = require('./tokicoin.js');
 // Use this to distribute TOKI tokens to friends
 
 class TokiDistributor {
-    constructor(network = 'mainnet') {
+    constructor(network = 'testnet') {
+        // Warn if using mainnet
+        if (network === 'mainnet') {
+            console.warn('⚠️  WARNING: Using mainnet - real funds will be transferred!');
+            console.warn('⚠️  Make sure this is intentional. Use testnet for testing.');
+        }
+        
         this.tokiCoin = new TokiCoinASA(network);
         this.network = network;
     }
@@ -134,11 +140,14 @@ class TokiDistributor {
 
 // Example usage and configuration
 async function main() {
-    // Configuration - UPDATE THESE VALUES
+    // Load environment configuration
+    require('dotenv').config({ path: '../../.env.local' });
+    
+    // Configuration - Load from environment variables
     const CONFIG = {
-        network: 'testnet', // Change to 'mainnet' for production
-        assetId: 743521125, // Your TokiCoin Asset ID
-        creatorMnemonic: process.env.CREATOR_MNEMONIC || 'YOUR_CREATOR_MNEMONIC_HERE', // Use environment variable
+        network: process.env.NETWORK || 'testnet', // Change to 'mainnet' for production
+        assetId: process.env.ASSET_ID ? parseInt(process.env.ASSET_ID) : null, // Your TokiCoin Asset ID
+        creatorMnemonic: process.env.CREATOR_MNEMONIC, // Use environment variable
     };
 
     // Friend list - UPDATE WITH ACTUAL ADDRESSES
@@ -170,13 +179,21 @@ async function main() {
     ];
 
     // Validation
-    if (CONFIG.assetId === 0) {
-        console.error('❌ Please set the Asset ID in CONFIG');
+    if (!CONFIG.assetId) {
+        console.error('❌ Please set ASSET_ID in .env.local');
+        console.error('💡 Example: ASSET_ID=743521125');
         return;
     }
 
-    if (CONFIG.creatorMnemonic === 'YOUR_CREATOR_MNEMONIC_HERE' || !CONFIG.creatorMnemonic) {
-        console.error('❌ Please set your creator mnemonic in CONFIG or CREATOR_MNEMONIC environment variable');
+    if (!CONFIG.creatorMnemonic) {
+        console.error('❌ Please set CREATOR_MNEMONIC in .env.local');
+        console.error('💡 Example: CREATOR_MNEMONIC="your 25 word mnemonic phrase here"');
+        return;
+    }
+    
+    // Validate Asset ID format
+    if (isNaN(CONFIG.assetId) || CONFIG.assetId <= 0) {
+        console.error('❌ Invalid ASSET_ID format. Must be a positive integer');
         return;
     }
 

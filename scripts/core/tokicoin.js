@@ -36,14 +36,28 @@ class TokiCoinASA {
 
     async createASA(creatorMnemonic) {
         try {
-            // Validate mnemonic format
+            // Comprehensive mnemonic validation
             if (!creatorMnemonic || typeof creatorMnemonic !== 'string') {
-                throw new Error('Invalid mnemonic provided');
+                throw new Error('Invalid mnemonic provided: must be a non-empty string');
+            }
+            
+            // Validate mnemonic format (should be 25 words)
+            const mnemonicWords = creatorMnemonic.trim().split(/\s+/);
+            if (mnemonicWords.length !== 25) {
+                throw new Error(`Invalid mnemonic format: expected 25 words, got ${mnemonicWords.length}`);
+            }
+            
+            // Check for obviously invalid words (basic validation)
+            const hasInvalidWords = mnemonicWords.some(word => 
+                word.length < 2 || word.length > 10 || !/^[a-z]+$/.test(word)
+            );
+            if (hasInvalidWords) {
+                throw new Error('Invalid mnemonic: contains invalid words (must be lowercase letters only, 2-10 chars)');
             }
             
             // Recover creator account from mnemonic and create AlgoKit signer
             const creatorAccount = algosdk.mnemonicToSecretKey(creatorMnemonic);
-            console.log('Creator Address:', creatorAccount.addr);
+            console.log('Creator Address:', '...' + creatorAccount.addr.slice(-6));
             
             // Create signer function for AlgoKit
             const signer = (txnGroup) => {
@@ -78,8 +92,19 @@ class TokiCoinASA {
             };
 
         } catch (error) {
-            console.error('Error creating ASA:', error);
-            throw error;
+            // Log detailed error for debugging, but throw sanitized error
+            console.error('[DEBUG] ASA creation error:', error.message);
+            
+            // Provide user-friendly error messages
+            if (error.message.includes('insufficient balance')) {
+                throw new Error('Insufficient ALGO balance to create ASA. Please fund your account.');
+            } else if (error.message.includes('Invalid mnemonic')) {
+                throw new Error('Invalid mnemonic provided. Please check your seed phrase.');
+            } else if (error.message.includes('network')) {
+                throw new Error('Network connection error. Please check your internet connection.');
+            } else {
+                throw new Error('Failed to create ASA. Please check your configuration and try again.');
+            }
         }
     }
 
@@ -90,13 +115,28 @@ class TokiCoinASA {
             const assetInfo = await this.algorand.client.algod.getAssetByID(assetId).do();
             return assetInfo;
         } catch (error) {
-            console.error('Error getting ASA info:', error);
-            throw error;
+            console.error('[DEBUG] ASA info error:', error.message);
+            throw new Error('Failed to retrieve ASA information. Please check the Asset ID and network connection.');
         }
     }
 
     async optInToASA(assetId, accountMnemonic) {
         try {
+            // Validate inputs
+            if (!assetId || typeof assetId !== 'number' || assetId <= 0) {
+                throw new Error('Invalid asset ID: must be a positive number');
+            }
+            
+            if (!accountMnemonic || typeof accountMnemonic !== 'string') {
+                throw new Error('Invalid mnemonic: must be a non-empty string');
+            }
+            
+            // Validate mnemonic format
+            const mnemonicWords = accountMnemonic.trim().split(/\s+/);
+            if (mnemonicWords.length !== 25) {
+                throw new Error(`Invalid mnemonic format: expected 25 words, got ${mnemonicWords.length}`);
+            }
+            
             const account = algosdk.mnemonicToSecretKey(accountMnemonic);
             
             // Create signer function for AlgoKit
@@ -115,20 +155,56 @@ class TokiCoinASA {
             return result.txIds[0];
 
         } catch (error) {
-            console.error('Error opting in to ASA:', error);
-            throw error;
+            console.error('[DEBUG] Opt-in error:', error.message);
+            
+            if (error.message.includes('already opted in')) {
+                throw new Error('Account is already opted into this ASA.');
+            } else if (error.message.includes('insufficient balance')) {
+                throw new Error('Insufficient ALGO balance for opt-in transaction. Please fund your account.');
+            } else {
+                throw new Error('Failed to opt into ASA. Please check your account and Asset ID.');
+            }
         }
     }
 
     async transferASA(assetId, fromMnemonic, toAddress, amount) {
         try {
-            // Validate inputs
-            if (!assetId || !fromMnemonic || !toAddress || amount <= 0) {
-                throw new Error('Invalid transfer parameters');
+            // Comprehensive input validation
+            if (!assetId || typeof assetId !== 'number' || assetId <= 0) {
+                throw new Error('Invalid asset ID: must be a positive number');
+            }
+            
+            if (!fromMnemonic || typeof fromMnemonic !== 'string') {
+                throw new Error('Invalid sender mnemonic: must be a non-empty string');
+            }
+            
+            // Validate mnemonic format
+            const mnemonicWords = fromMnemonic.trim().split(/\s+/);
+            if (mnemonicWords.length !== 25) {
+                throw new Error(`Invalid mnemonic format: expected 25 words, got ${mnemonicWords.length}`);
+            }
+            
+            if (!toAddress || typeof toAddress !== 'string') {
+                throw new Error('Invalid recipient address: must be a non-empty string');
             }
             
             if (!algosdk.isValidAddress(toAddress)) {
-                throw new Error('Invalid recipient address');
+                throw new Error('Invalid recipient address format');
+            }
+            
+            // Validate amount
+            if (typeof amount !== 'number' || amount <= 0) {
+                throw new Error('Invalid amount: must be a positive number');
+            }
+            
+            if (amount > Number.MAX_SAFE_INTEGER) {
+                throw new Error('Invalid amount: too large');
+            }
+            
+            // Check for reasonable amount bounds (prevent obvious mistakes)
+            const maxReasonableAmount = 1000000000000000; // 1 billion tokens in micro-units
+            if (amount > maxReasonableAmount) {
+                throw new Error(`Amount too large: ${amount} exceeds reasonable limit of ${maxReasonableAmount}`);
             }
             
             const fromAccount = algosdk.mnemonicToSecretKey(fromMnemonic);
@@ -159,8 +235,19 @@ class TokiCoinASA {
             return result.txIds[0];
 
         } catch (error) {
-            console.error('Error transferring ASA:', error);
-            throw error;
+            console.error('[DEBUG] Transfer error:', error.message);
+            
+            if (error.message.includes('Insufficient balance')) {
+                throw new Error('Insufficient token balance for transfer. Please check your balance.');
+            } else if (error.message.includes('not opted in')) {
+                throw new Error('Recipient has not opted into this ASA. They must opt-in first.');
+            } else if (error.message.includes('insufficient balance')) {
+                throw new Error('Insufficient ALGO balance for transaction fee. Please fund your account.');
+            } else if (error.message.includes('Invalid recipient address')) {
+                throw new Error('Invalid recipient address format.');
+            } else {
+                throw new Error('Transfer failed. Please check all parameters and try again.');
+            }
         }
     }
 
