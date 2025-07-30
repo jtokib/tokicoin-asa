@@ -57,7 +57,7 @@ class TokiCoinASA {
             
             // Recover creator account from mnemonic and create AlgoKit signer
             const creatorAccount = algosdk.mnemonicToSecretKey(creatorMnemonic);
-            console.log('Creator Address:', '...' + creatorAccount.addr.slice(-6));
+            console.log('Creator Address:', '...' + String(creatorAccount.addr).slice(-6));
             
             // Create signer function for AlgoKit
             const signer = (txnGroup) => {
@@ -66,14 +66,14 @@ class TokiCoinASA {
 
             // Create ASA using AlgoKit's simplified interface
             const result = await this.algorand.send.assetCreate({
-                sender: creatorAccount.addr,
+                sender: String(creatorAccount.addr),
                 total: BigInt(this.asaParams.total * Math.pow(10, this.asaParams.decimals)),
                 decimals: this.asaParams.decimals,
                 defaultFrozen: this.asaParams.defaultFrozen,
-                manager: creatorAccount.addr,
-                reserve: creatorAccount.addr,
-                freeze: creatorAccount.addr,
-                clawback: creatorAccount.addr,
+                manager: String(creatorAccount.addr),
+                reserve: String(creatorAccount.addr),
+                freeze: String(creatorAccount.addr),
+                clawback: String(creatorAccount.addr),
                 unitName: this.asaParams.unitName,
                 assetName: this.asaParams.assetName,
                 url: this.asaParams.assetURL,
@@ -86,9 +86,9 @@ class TokiCoinASA {
             console.log('Transaction ID:', result.txIds[0]);
 
             return {
-                assetId: result.confirmation.assetIndex,
+                assetId: Number(result.confirmation.assetIndex),
                 txId: result.txIds[0],
-                creatorAddress: creatorAccount.addr
+                creatorAddress: String(creatorAccount.addr)
             };
 
         } catch (error) {
@@ -146,7 +146,7 @@ class TokiCoinASA {
 
             // Use AlgoKit's simplified asset opt-in
             const result = await this.algorand.send.assetOptIn({
-                sender: account.addr,
+                sender: String(account.addr),
                 assetId: assetId,
                 signer: signer
             });
@@ -210,7 +210,7 @@ class TokiCoinASA {
             const fromAccount = algosdk.mnemonicToSecretKey(fromMnemonic);
             
             // Check sender balance using AlgoKit
-            const accountInfo = await this.algorand.client.algod.accountInformation(fromAccount.addr).do();
+            const accountInfo = await this.algorand.client.algod.accountInformation(String(fromAccount.addr)).do();
             const assetHolding = accountInfo.assets.find(asset => Number(asset.assetId) === assetId || asset['asset-id'] === assetId);
             
             if (!assetHolding || assetHolding.amount < amount) {
@@ -224,7 +224,7 @@ class TokiCoinASA {
 
             // Use AlgoKit's simplified asset transfer
             const result = await this.algorand.send.assetTransfer({
-                sender: fromAccount.addr,
+                sender: String(fromAccount.addr),
                 receiver: toAddress,
                 assetId: assetId,
                 amount: BigInt(amount),
@@ -256,7 +256,7 @@ class TokiCoinASA {
         const mnemonic = algosdk.secretKeyToMnemonic(account.sk);
 
         return {
-            address: account.addr,
+            address: String(account.addr),
             mnemonic: mnemonic,
             secretKey: account.sk
         };
@@ -265,7 +265,7 @@ class TokiCoinASA {
 
 // Usage example
 async function main() {
-    const tokiCoin = new TokiCoinASA('testnet'); // Use 'mainnet' for production
+    const tokiCoin = new TokiCoinASA('mainnet'); // Use 'mainnet' for production
 
     // Use existing mnemonic from environment
     require('dotenv').config({ path: '.env.local' });

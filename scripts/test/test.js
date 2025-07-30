@@ -1,7 +1,7 @@
 const { TokiCoinASA } = require('../core/tokicoin.js');
 
 async function test() {
-    const tokiCoin = new TokiCoinASA('testnet');
+    const tokiCoin = new TokiCoinASA('mainnet');
 
     // Replace with your actual values
     const assetId = 123456789; // Your Asset ID from Step 5

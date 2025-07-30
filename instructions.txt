@@ -41,6 +41,7 @@ const account = algosdk.generateAccount();
 const mnemonic = algosdk.secretKeyToMnemonic(account.sk);
 console.log('Address:', account.addr);
 console.log('Mnemonic:', mnemonic);
+console.log('Address:', account.addr.toString());
 "
 ```
 
@@ -123,7 +124,7 @@ async function checkRecipient() {
         const hasOptedIn = accountInfo.assets.some(asset => Number(asset.assetId) === assetId);
         
         console.log('Recipient Address:', recipientAddress);
-        console.log('ALGO Balance:', accountInfo.amount / 1000000, 'ALGO');
+        console.log('ALGO Balance:', Number(accountInfo.amount) / 1000000, 'ALGO');
         console.log('Opted into Asset ID', assetId, ':', hasOptedIn ? '✅ YES' : '❌ NO');
         
         if (!hasOptedIn) {
@@ -189,7 +190,7 @@ node scripts/tools/check-asa.js
 ```
 
 ### View on Algorand Explorer:
-- **Testnet Explorer**: https://testnet.explorer.perawallet.app/
+- **Testnet Explorer**: https://tclestnet.explorer.perawallet.app/
 - Search for your Asset ID to see full transaction history
 - Search for recipient address to verify token balance
 
