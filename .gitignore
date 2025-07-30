@@ -88,5 +88,10 @@ mainnet-*.js
 # Backup files
 *.bak
 *.backup
+
+# Security audit files (contain sensitive information)
+SECURITY_AUDIT.md
+security-report.txt
+
 # Local Netlify folder
 .netlify

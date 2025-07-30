@@ -1,0 +1,213 @@
+# 🧪 TokiCoin Testnet Testing Guide
+
+## Prerequisites ✅
+
+1. **Node.js v22+** installed
+2. **Project dependencies** installed: `npm install`
+3. **Testnet ALGO** for transaction fees
+
+## Step 1: Set Up Environment Variables
+
+Create or update your `.env.local` file in the project root:
+
+```bash
+# Create .env.local file
+touch .env.local
+```
+
+Add the following to `.env.local`:
+```env
+# Creator account (you'll generate this)
+CREATOR_MNEMONIC="your 25 word mnemonic phrase here"
+
+# Test recipient address (provided)
+TEST_RECIPIENT_ADDRESS=RU333SUK5P6CNPMSME22ZL4O7Z6CALIASRAICZZTPJSHLNVAHI27WYIPYI
+
+# Network configuration
+NETWORK=testnet
+
+# Asset ID (will be filled after ASA creation)
+ASSET_ID=
+```
+
+## Step 2: Generate Creator Account & Get Testnet ALGO 💰
+
+### Option A: Generate New Account
+```bash
+# Generate a new account
+node -e "
+const algosdk = require('algosdk');
+const account = algosdk.generateAccount();
+const mnemonic = algosdk.secretKeyToMnemonic(account.sk);
+console.log('Address:', account.addr);
+console.log('Mnemonic:', mnemonic);
+"
+```
+
+### Option B: Use Existing Account
+If you have an existing testnet account, use its mnemonic.
+
+### Fund Your Account
+1. Copy your creator address
+2. Visit: https://bank.testnet.algorand.network/
+3. Paste your address and request testnet ALGO
+4. Wait for confirmation (usually ~4 seconds)
+
+### Update .env.local
+Add your creator mnemonic to `.env.local`:
+```env
+CREATOR_MNEMONIC="your actual 25 word mnemonic phrase from above"
+```
+
+## Step 3: Create TokiCoin ASA 🚀
+
+Run the ASA creation script:
+```bash
+node scripts/core/tokicoin.js
+```
+
+**Expected Output:**
+```
+🚀 Creating new TokiCoin ASA with existing mnemonic...
+Creator Address: ...ABC123  # (masked for privacy)
+TokiCoin ASA created successfully!
+Asset ID: 1234567890
+Transaction ID: ABC123XYZ...
+🔗 View on AlgoExplorer:
+https://testnet.explorer.perawallet.app/tx/ABC123XYZ...
+
+📝 Update your .env.local with the new Asset ID: 1234567890
+```
+
+### Update .env.local with Asset ID
+Add the Asset ID to your `.env.local`:
+```env
+ASSET_ID=1234567890  # Use your actual Asset ID from above
+```
+
+## Step 4: Verify ASA Creation ✅
+
+Check your creator account balance:
+```bash
+node scripts/tools/check-account.js
+```
+
+**Expected Output:**
+```
+🔍 Checking account: ...ABC123
+💰 ALGO Balance: 9.999 ALGO  # (slightly less due to creation fee)
+📊 Assets: 1
+✅ Has opted into Asset ID: 1234567890
+💎 TOKI Balance: 20000000 TOKI  # Full 20M supply
+💎 Raw micro-units: 20000000000000
+```
+
+## Step 5: Prepare Recipient for Token Transfer 🎯
+
+The recipient address `RU333SUK5P6CNPMSME22ZL4O7Z6CALIASRAICZZTPJSHLNVAHI27WYIPYI` needs to opt-in to your ASA before receiving tokens.
+
+### Check if recipient needs opt-in:
+```bash
+# Check recipient status
+node -e "
+const { TokiCoinASA } = require('./scripts/core/tokicoin.js');
+require('dotenv').config({ path: '.env.local' });
+
+async function checkRecipient() {
+    const tokiCoin = new TokiCoinASA('testnet');
+    const recipientAddress = process.env.TEST_RECIPIENT_ADDRESS;
+    const assetId = parseInt(process.env.ASSET_ID);
+    
+    try {
+        const accountInfo = await tokiCoin.algorand.client.algod.accountInformation(recipientAddress).do();
+        const hasOptedIn = accountInfo.assets.some(asset => Number(asset.assetId) === assetId);
+        
+        console.log('Recipient Address:', recipientAddress);
+        console.log('ALGO Balance:', accountInfo.amount / 1000000, 'ALGO');
+        console.log('Opted into Asset ID', assetId, ':', hasOptedIn ? '✅ YES' : '❌ NO');
+        
+        if (!hasOptedIn) {
+            console.log('⚠️ Recipient must opt-in before receiving tokens');
+        }
+    } catch (error) {
+        console.log('❌ Account not found or error:', error.message);
+    }
+}
+
+checkRecipient();
+"
+```
+
+## Step 6: Transfer All Tokens to Recipient 💸
+
+Run the transfer test (this will send all 20M TOKI tokens):
+```bash
+node scripts/test/test-transfer.js
+```
+
+**Expected Output:**
+```
+🧪 Testing TOKI transfer on testnet
+📊 Asset ID: 1234567890
+📬 Recipient: RU333SUK5P6CNPMSME22ZL4O7Z6CALIASRAICZZTPJSHLNVAHI27WYIPYI
+💰 Amount: 20,000,000 TOKI
+
+🔍 Checking if recipient has opted into ASA...
+✅ Recipient has opted into the ASA
+
+🚀 Sending 20,000,000 TOKI...
+Successfully transferred 20000000000000 TOKI to RU333SUK5P6CNPMSME22ZL4O7Z6CALIASRAICZZTPJSHLNVAHI27WYIPYI
+✅ Transfer successful!
+📄 Transaction ID: DEF456GHI...
+🔗 View on AlgoExplorer:
+https://testnet.explorer.perawallet.app/tx/DEF456GHI...
+
+🔍 Verifying transfer...
+✅ Recipient now holds: 20000000 TOKI
+```
+
+## Step 7: Final Verification 🔍
+
+### Check Creator Account (should have 0 TOKI):
+```bash
+node scripts/tools/check-account.js
+```
+
+**Expected Output:**
+```
+🔍 Checking account: ...ABC123
+💰 ALGO Balance: 9.998 ALGO  # (less due to transfer fee)
+📊 Assets: 1
+✅ Has opted into Asset ID: 1234567890
+💎 TOKI Balance: 0 TOKI  # All tokens transferred
+💎 Raw micro-units: 0
+```
+
+### Check ASA Information:
+```bash
+node scripts/tools/check-asa.js
+```
+
+### View on Algorand Explorer:
+- **Testnet Explorer**: https://testnet.explorer.perawallet.app/
+- Search for your Asset ID to see full transaction history
+- Search for recipient address to verify token balance
+
+## 🚨 Important Notes:
+
+1. **Recipient Must Opt-In**: If the recipient hasn't opted into your ASA, the transfer will fail with "not opted in" error
+2. **Environment Variables**: Ensure all variables in `.env.local` are set correctly
+3. **Network**: Always verify you're on testnet (not mainnet)
+4. **Backup**: Save your `.env.local` file securely - it contains your mnemonic
+
+## ✅ Success Criteria:
+
+- [x] ASA created successfully with 20M TOKI supply
+- [x] Creator account receives all 20M tokens initially
+- [x] Recipient opts into the ASA (if needed)
+- [x] All 20M tokens transferred to recipient
+- [x] Creator account shows 0 TOKI balance
+- [x] Recipient account shows 20M TOKI balance
+- [x] All transactions visible on testnet explorer
+
+Your TokiCoin ASA is now fully tested and ready for mainnet deployment! 🎉
