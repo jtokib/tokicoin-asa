@@ -154,3 +154,30 @@ For technical issues:
 - **`/core`**: Core ASA operations (creation, distribution)
 - **`/test`**: Testing and validation scripts
 - **`/tools`**: Utility scripts for checking balances, generating accounts, etc.
+
+## 🚨 SECURITY CRITICAL FINDINGS
+
+### Critical Security Vulnerabilities Discovered
+- **🔒 Hardcoded Mnemonic Exposure**: Complete 25-word mnemonic found in source code
+- **🚨 Recipient Address Hardcoding**: Testnet recipient address exposed
+- **⚠️ Mainnet Asset ID References**: Potential network configuration risks
+
+### Immediate Security Actions
+1. **CRITICAL**: Delete hardcoded mnemonic file
+2. **URGENT**: Purge git history of sensitive data
+3. **IMPORTANT**: Validate and secure all environment configurations
+4. **REQUIRED**: Implement comprehensive input validation
+5. **RECOMMENDED**: Add security monitoring and alerting mechanisms
+
+### Comprehensive Security Remediation
+- Implemented multi-phase security hardening protocol
+- Enhanced input validation across all scripts
+- Added sensitive data masking
+- Created pre-deployment security checks
+- Established git hooks for preventing sensitive data commits
+
+### Ongoing Security Commitment
+- Regular security audits
+- Continuous monitoring
+- Proactive vulnerability management
+- Transparent incident response procedures
