@@ -1,6 +1,6 @@
 import './style.css'
 
-const ASSET_ID = 'TBD'; // Replace with actual Asset ID when deployed
+const ASSET_ID = '3145241720'; // TokiCoin Mainnet Asset ID
 
 function copyToClipboard(text) {
   navigator.clipboard.writeText(text).then(() => {
@@ -55,7 +55,7 @@ function setupButtons() {
         alert('Asset ID not yet available. Token is still being deployed.');
         return;
       }
-      window.open(`https://algoexplorer.io/asset/${ASSET_ID}`, '_blank');
+      window.open(`https://explorer.perawallet.app/asset/${ASSET_ID}`, '_blank');
     });
   }
 }
@@ -156,7 +156,6 @@ document.querySelector('#app').innerHTML = `
     <div class="buttons">
       <button id="add-to-wallet" class="button">Add to Wallet</button>
       <button id="view-explorer" class="button secondary">View on Explorer</button>
-      <a href="https://github.com/jtokib/tokicoin-asa" class="button secondary" target="_blank">GitHub</a>
     </div>
 
     <div class="section">
