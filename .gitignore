@@ -62,7 +62,7 @@ jspm_packages/
 # Yarn Integrity file
 .yarn-integrity
 
-# Sensitive files - NEVER COMMIT THESE
+# SECURITY: Sensitive crypto files - NEVER COMMIT
 *.mnemonic
 *mnemonic*
 *private*
@@ -70,28 +70,47 @@ jspm_packages/
 *wallet*
 *.key
 *.pem
+*seed*
+*phrase*
+
+# SECURITY: Test files with real data
 *-test.js
 test-*.js
+*test-mainnet*
+*mainnet-test*
 TESTING_*.md
+*-REAL.js
+*-PRODUCTION.js
 
-# Algorand specific
+# SECURITY: Environment files
+.env.local
+.env.production
+.env.mainnet
+.env.secrets
+
+# SECURITY: Backup and recovery files
+*.backup
+*.bak
+*-backup.*
+recovery-*
+backup-*
+
+# SECURITY: Account information
 account-info.json
 wallet-info.json
 creator-account.json
+mainnet-*.json
 
-# Test files with real data
-test-mainnet.js
+# SECURITY: Temporary and diagnostic files
+temp-*
+debug-*
+*-debug.*
+diagnostic-*
+
+# SECURITY: Mainnet operations (should be intentional)
 mainnet-*.js
-*test-distribution*
-*test-asa*
-
-# Backup files
-*.bak
-*.backup
-
-# Security audit files (contain sensitive information)
-SECURITY_AUDIT.md
-security-report.txt
+*mainnet-config*
+production-*.js
 
 # Local Netlify folder
 .netlify
