@@ -1,0 +1,6 @@
+Contact: mailto:security@tokicoin.algo
+Expires: 2025-12-31T23:59:00.000Z
+Acknowledgments: https://tokicoin.algo/security
+Policy: https://tokicoin.algo/security-policy
+Preferred-Languages: en
+Canonical: https://tokicoin.algo/.well-known/security.txt

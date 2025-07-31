@@ -2,7 +2,25 @@ import './style.css'
 
 const ASSET_ID = '3145241720'; // TokiCoin Mainnet Asset ID
 
+// Input sanitization function
+function sanitizeInput(input) {
+  const div = document.createElement('div');
+  div.textContent = input;
+  return div.innerHTML;
+}
+
+// Secure text content setting
+function setTextContent(element, text) {
+  element.textContent = text;
+}
+
 function copyToClipboard(text) {
+  // Validate input before copying
+  if (typeof text !== 'string' || text.length === 0) {
+    showCopyNotification('Invalid input');
+    return;
+  }
+  
   navigator.clipboard.writeText(text).then(() => {
     showCopyNotification('Copied!');
   }).catch(() => {
@@ -60,123 +78,287 @@ function setupButtons() {
   }
 }
 
-document.querySelector('#app').innerHTML = `
-  <div class="header-wrapper">
-    <img src="/TokiCoin Adventures.png" alt="TokiCoin Adventures" class="header-bg">
-    <header>
-    </header>
-  </div>
-
-  <div class="container">
- <div class="subtitle">
-          <span class="badge blue">Algorand</span>
-          <span class="badge green">ASA Token</span>
-          <span class="badge orange">Memecoin</span>
-        </div>
-    <div class="stats">
-      <div class="stat-card">
-        <div class="stat-value">20M</div>
-        <div class="stat-label">Total Supply</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value">$0.000001</div>
-        <div class="stat-label">Initial Price</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value">$20</div>
-        <div class="stat-label">Market Cap</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value">TOKI</div>
-        <div class="stat-label">Symbol</div>
-      </div>
-    </div>
-
-    <div class="section">
-      <h2>What is TokiCoin?</h2>
-      <p>TokiCoin (TOKI) is a memecoin built on the Algorand blockchain as an Algorand Standard Asset (ASA). 
-      It serves absolutely no purpose other than being a fun token to share with friends.</p>
-      <p>Inspired by the spirit of Dogecoin, TokiCoin embraces the fact that it's completely pointless. 
-      No grand mission, no world-changing utility - just a simple, secure token on one of the fastest blockchains.</p>
-    </div>
-
-    <div class="section">
-      <h2>Technical Specifications</h2>
-      <div class="technical-specs">
-        <div class="spec-item">
-          <span class="spec-label">Blockchain:</span>
-          <span class="spec-value">Algorand</span>
-        </div>
-        <div class="spec-item">
-          <span class="spec-label">Token Type:</span>
-          <span class="spec-value">ASA (Algorand Standard Asset)</span>
-        </div>
-        <div class="spec-item">
-          <span class="spec-label">Total Supply:</span>
-          <span class="spec-value">20,000,000 TOKI</span>
-        </div>
-        <div class="spec-item">
-          <span class="spec-label">Decimals:</span>
-          <span class="spec-value">6</span>
-        </div>
-        <div class="spec-item">
-          <span class="spec-label">Initial Price:</span>
-          <span class="spec-value">$0.000001</span>
-        </div>
-        <div class="spec-item">
-          <span class="spec-label">Market Cap:</span>
-          <span class="spec-value">$20</span>
-        </div>
-        <div class="spec-item">
-          <span class="spec-label">Asset ID:</span>
-          <span class="spec-value copyable">${ASSET_ID}</span>
-        </div>
-        <div class="spec-item">
-          <span class="spec-label">Network:</span>
-          <span class="spec-value">Mainnet</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="section">
-      <h2>Why Algorand?</h2>
-      <p>Algorand offers fast, secure, and low-cost transactions, making it perfect for a memecoin like TokiCoin. 
-      With near-instant finality and minimal fees, sending TOKI to friends is seamless and affordable.</p>
-      <p>The Algorand Standard Asset (ASA) framework ensures TokiCoin is built with the same security and 
-      reliability as any other token on the network.</p>
-    </div>
-
-    <div class="warning">
-      <h3>⚠️ Important Disclaimer</h3>
-      <p>TokiCoin is a memecoin with no inherent value or utility. It's created purely for entertainment and 
-      educational purposes. Do not invest money you cannot afford to lose. This token has no roadmap, 
-      no team behind it, and no plans for development. It's just for fun!</p>
-    </div>
-
-    <div class="buttons">
-      <button id="add-to-wallet" class="button">Add to Wallet</button>
-      <button id="view-explorer" class="button secondary">View on Explorer</button>
-    </div>
-
-    <div class="section">
-      <h2>How to Get TOKI</h2>
-      <p><strong>Step 1:</strong> Set up an Algorand wallet (Pera Wallet, MyAlgo, etc.)</p>
-      <p><strong>Step 2:</strong> Add TokiCoin ASA to your wallet using the Asset ID</p>
-      <p><strong>Step 3:</strong> Ask a friend who has TOKI to send you some, or contact the creator</p>
-      <p><strong>Step 4:</strong> Share the pointless joy with others!</p>
-    </div>
-  </div>
-
-  <div class="footer-wrapper">
-    <img src="/TokiCoin – Fun with Crypto.png" alt="TokiCoin Fun with Crypto" class="footer-bg">
-    <footer>
-    </footer>
-  </div>
+// Secure DOM creation function
+function createSecureDOM() {
+  const app = document.querySelector('#app');
   
-  <div class="container">
-      <p>&copy; 2025 TokiCoin • Built with ❤️ on Algorand • Completely Pointless by Design</p>
-  </div>
-`
+  // Clear existing content safely
+  while (app.firstChild) {
+    app.removeChild(app.firstChild);
+  }
+  
+  // Create header wrapper
+  const headerWrapper = document.createElement('div');
+  headerWrapper.className = 'header-wrapper';
+  
+  const headerImg = document.createElement('img');
+  headerImg.src = '/TokiCoin Adventures.webp';
+  headerImg.alt = 'TokiCoin Adventures';
+  headerImg.className = 'header-bg';
+  headerImg.loading = 'lazy';
+  
+  const header = document.createElement('header');
+  
+  headerWrapper.appendChild(headerImg);
+  headerWrapper.appendChild(header);
+  app.appendChild(headerWrapper);
+  
+  // Create main container
+  const container = document.createElement('div');
+  container.className = 'container';
+  
+  // Create subtitle with badges
+  const subtitle = document.createElement('div');
+  subtitle.className = 'subtitle';
+  
+  const badges = [
+    { text: 'Algorand', class: 'badge blue' },
+    { text: 'ASA Token', class: 'badge green' },
+    { text: 'Memecoin', class: 'badge orange' }
+  ];
+  
+  badges.forEach(badge => {
+    const span = document.createElement('span');
+    span.className = badge.class;
+    span.textContent = badge.text;
+    subtitle.appendChild(span);
+  });
+  
+  container.appendChild(subtitle);
+  
+  // Create stats section
+  const stats = document.createElement('div');
+  stats.className = 'stats';
+  
+  const statsData = [
+    { value: '20M', label: 'Total Supply' },
+    { value: '$0.000001', label: 'Initial Price' },
+    { value: '$20', label: 'Market Cap' },
+    { value: 'TOKI', label: 'Symbol' }
+  ];
+  
+  statsData.forEach(stat => {
+    const card = document.createElement('div');
+    card.className = 'stat-card';
+    
+    const value = document.createElement('div');
+    value.className = 'stat-value';
+    value.textContent = stat.value;
+    
+    const label = document.createElement('div');
+    label.className = 'stat-label';
+    label.textContent = stat.label;
+    
+    card.appendChild(value);
+    card.appendChild(label);
+    stats.appendChild(card);
+  });
+  
+  container.appendChild(stats);
+  
+  // Create sections safely
+  createSection(container, 'What is TokiCoin?', [
+    'TokiCoin (TOKI) is a memecoin built on the Algorand blockchain as an Algorand Standard Asset (ASA). It serves absolutely no purpose other than being a fun token to share with friends.',
+    'Inspired by the spirit of Dogecoin, TokiCoin embraces the fact that it\'s completely pointless. No grand mission, no world-changing utility - just a simple, secure token on one of the fastest blockchains.'
+  ]);
+  
+  // Technical specifications section
+  createTechnicalSpecs(container);
+  
+  createSection(container, 'Why Algorand?', [
+    'Algorand offers fast, secure, and low-cost transactions, making it perfect for a memecoin like TokiCoin. With near-instant finality and minimal fees, sending TOKI to friends is seamless and affordable.',
+    'The Algorand Standard Asset (ASA) framework ensures TokiCoin is built with the same security and reliability as any other token on the network.'
+  ]);
+  
+  // Warning section
+  createWarningSection(container);
+  
+  // Buttons section
+  createButtonsSection(container);
+  
+  createSection(container, 'How to Get TOKI', [
+    'Step 1: Set up an Algorand wallet (Pera Wallet, MyAlgo, etc.)',
+    'Step 2: Add TokiCoin ASA to your wallet using the Asset ID',
+    'Step 3: Ask a friend who has TOKI to send you some, or contact the creator',
+    'Step 4: Share the pointless joy with others!'
+  ]);
+  
+  app.appendChild(container);
+  
+  // Create footer
+  createFooter(app);
+}
+
+function createSection(parent, title, paragraphs) {
+  const section = document.createElement('div');
+  section.className = 'section';
+  
+  const h2 = document.createElement('h2');
+  h2.textContent = title;
+  section.appendChild(h2);
+  
+  paragraphs.forEach(text => {
+    const p = document.createElement('p');
+    if (text.includes('Step')) {
+      const parts = text.split(': ');
+      const strong = document.createElement('strong');
+      strong.textContent = parts[0] + ': ';
+      p.appendChild(strong);
+      p.appendChild(document.createTextNode(parts[1]));
+    } else {
+      p.textContent = text;
+    }
+    section.appendChild(p);
+  });
+  
+  parent.appendChild(section);
+}
+
+function createTechnicalSpecs(parent) {
+  const section = document.createElement('div');
+  section.className = 'section';
+  
+  const h2 = document.createElement('h2');
+  h2.textContent = 'Technical Specifications';
+  section.appendChild(h2);
+  
+  const specs = document.createElement('div');
+  specs.className = 'technical-specs';
+  
+  const specData = [
+    { label: 'Blockchain:', value: 'Algorand' },
+    { label: 'Token Type:', value: 'ASA (Algorand Standard Asset)' },
+    { label: 'Total Supply:', value: '20,000,000 TOKI' },
+    { label: 'Decimals:', value: '6' },
+    { label: 'Initial Price:', value: '$0.000001' },
+    { label: 'Market Cap:', value: '$20' },
+    { label: 'Asset ID:', value: ASSET_ID, copyable: true },
+    { label: 'Network:', value: 'Mainnet' }
+  ];
+  
+  specData.forEach(spec => {
+    const item = document.createElement('div');
+    item.className = 'spec-item';
+    
+    const label = document.createElement('span');
+    label.className = 'spec-label';
+    label.textContent = spec.label;
+    
+    const value = document.createElement('span');
+    value.className = spec.copyable ? 'spec-value copyable' : 'spec-value';
+    value.textContent = spec.value;
+    
+    item.appendChild(label);
+    item.appendChild(value);
+    specs.appendChild(item);
+  });
+  
+  section.appendChild(specs);
+  parent.appendChild(section);
+}
+
+function createWarningSection(parent) {
+  const warning = document.createElement('div');
+  warning.className = 'warning';
+  
+  const h3 = document.createElement('h3');
+  h3.textContent = '⚠️ Important Disclaimer';
+  
+  const p = document.createElement('p');
+  p.textContent = 'TokiCoin is a memecoin with no inherent value or utility. It\'s created purely for entertainment and educational purposes. Do not invest money you cannot afford to lose. This token has no roadmap, no team behind it, and no plans for development. It\'s just for fun!';
+  
+  warning.appendChild(h3);
+  warning.appendChild(p);
+  parent.appendChild(warning);
+}
+
+function createButtonsSection(parent) {
+  const buttons = document.createElement('div');
+  buttons.className = 'buttons';
+  
+  const addButton = document.createElement('button');
+  addButton.id = 'add-to-wallet';
+  addButton.className = 'button';
+  addButton.textContent = 'Add to Wallet';
+  
+  const explorerButton = document.createElement('button');
+  explorerButton.id = 'view-explorer';
+  explorerButton.className = 'button secondary';
+  explorerButton.textContent = 'View on Explorer';
+  
+  buttons.appendChild(addButton);
+  buttons.appendChild(explorerButton);
+  parent.appendChild(buttons);
+}
+
+function createFooter(parent) {
+  const footerWrapper = document.createElement('div');
+  footerWrapper.className = 'footer-wrapper';
+  
+  const footerImg = document.createElement('img');
+  footerImg.src = '/TokiCoin – Fun with Crypto.webp';
+  footerImg.alt = 'TokiCoin Fun with Crypto';
+  footerImg.className = 'footer-bg';
+  footerImg.loading = 'lazy';
+  
+  const footer = document.createElement('footer');
+  
+  footerWrapper.appendChild(footerImg);
+  footerWrapper.appendChild(footer);
+  parent.appendChild(footerWrapper);
+  
+  const container = document.createElement('div');
+  container.className = 'container';
+  
+  const p = document.createElement('p');
+  p.textContent = '© 2025 TokiCoin • Built with ❤️ on Algorand • Completely Pointless by Design';
+  
+  container.appendChild(p);
+  parent.appendChild(container);
+}
+
+// Initialize secure DOM
+createSecureDOM();
+
+function setupImageLoading() {
+  const images = document.querySelectorAll('img[loading="lazy"]');
+  
+  images.forEach(img => {
+    // Handle WebP support with fallback
+    const createImage = () => {
+      const testImg = new Image();
+      testImg.onload = () => {
+        img.classList.add('loaded');
+      };
+      testImg.onerror = () => {
+        // Fallback to PNG if WebP fails
+        if (img.src.includes('.webp')) {
+          img.src = img.src.replace('.webp', '.png');
+        }
+        img.classList.add('loaded');
+      };
+      testImg.src = img.src;
+    };
+
+    // Use Intersection Observer for better lazy loading
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            createImage();
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1 });
+      
+      observer.observe(img);
+    } else {
+      // Fallback for older browsers
+      createImage();
+    }
+  });
+}
 
 setupCopyButtons();
 setupButtons();
+setupImageLoading();

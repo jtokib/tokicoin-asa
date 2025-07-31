@@ -101,6 +101,17 @@ body {
   object-fit: contain;
   object-position: center;
   z-index: 1;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.header-bg[loading="lazy"] {
+  background-size: 200% 100%;
+  animation: loading-shimmer 1.5s infinite;
+}
+
+.header-bg.loaded {
+  opacity: 1;
 }
 
 .footer-wrapper {
@@ -122,6 +133,17 @@ body {
   object-fit: contain;
   object-position: center;
   z-index: 1;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.footer-bg[loading="lazy"] {
+  background-size: 200% 100%;
+  animation: loading-shimmer 1.5s infinite;
+}
+
+.footer-bg.loaded {
+  opacity: 1;
 }
 
 .container {
@@ -448,6 +470,15 @@ footer {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+@keyframes loading-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 /* Badge Component */
