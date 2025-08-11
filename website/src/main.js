@@ -331,10 +331,30 @@ function createFooter(parent) {
 createSecureDOM();
 
 function setupImageLoading() {
-  const images = document.querySelectorAll('img[loading="lazy"]');
+  const lazyImages = document.querySelectorAll('img[loading="lazy"]');
+  const eagerImages = document.querySelectorAll('img[loading="eager"]');
   
-  images.forEach(img => {
-    // Handle WebP support with fallback
+  // Handle eager images immediately
+  eagerImages.forEach(img => {
+    const handleEagerImage = () => {
+      if (img.complete && img.naturalWidth > 0) {
+        img.classList.add('loaded');
+      } else {
+        img.onload = () => img.classList.add('loaded');
+        img.onerror = () => {
+          // Fallback to PNG if WebP fails
+          if (img.src.includes('.webp')) {
+            img.src = img.src.replace('.webp', '.png');
+          }
+          img.classList.add('loaded');
+        };
+      }
+    };
+    handleEagerImage();
+  });
+  
+  // Handle lazy images with intersection observer
+  lazyImages.forEach(img => {
     const createImage = () => {
       const testImg = new Image();
       testImg.onload = () => {
