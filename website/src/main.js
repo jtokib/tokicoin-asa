@@ -93,17 +93,25 @@ function createSecureDOM() {
   
   const headerImg = document.createElement('img');
   headerImg.src = '/TokiCoin Adventures.webp';
-  headerImg.alt = 'TokiCoin Adventures';
+  headerImg.alt = 'TokiCoin Adventures banner featuring the official Algorand memecoin logo and branding';
   headerImg.className = 'header-bg';
-  headerImg.loading = 'lazy';
+  headerImg.loading = 'eager';
+  headerImg.decoding = 'async';
+  headerImg.fetchPriority = 'high';
   
   const header = document.createElement('header');
+  const h1 = document.createElement('h1');
+  h1.textContent = 'TokiCoin (TOKI)';
+  h1.style.position = 'absolute';
+  h1.style.left = '-9999px'; // Screen reader accessible but visually hidden
+  header.appendChild(h1);
   
   headerWrapper.appendChild(headerImg);
   headerWrapper.appendChild(header);
   app.appendChild(headerWrapper);
   
   // Create main container
+  const main = document.createElement('main');
   const container = document.createElement('div');
   container.className = 'container';
   
@@ -183,14 +191,15 @@ function createSecureDOM() {
     'Step 4: Share the pointless joy with others!'
   ]);
   
-  app.appendChild(container);
+  main.appendChild(container);
+  app.appendChild(main);
   
   // Create footer
   createFooter(app);
 }
 
 function createSection(parent, title, paragraphs) {
-  const section = document.createElement('div');
+  const section = document.createElement('section');
   section.className = 'section';
   
   const h2 = document.createElement('h2');
@@ -215,7 +224,7 @@ function createSection(parent, title, paragraphs) {
 }
 
 function createTechnicalSpecs(parent) {
-  const section = document.createElement('div');
+  const section = document.createElement('section');
   section.className = 'section';
   
   const h2 = document.createElement('h2');
@@ -297,9 +306,10 @@ function createFooter(parent) {
   
   const footerImg = document.createElement('img');
   footerImg.src = '/TokiCoin – Fun with Crypto.webp';
-  footerImg.alt = 'TokiCoin Fun with Crypto';
+  footerImg.alt = 'TokiCoin Fun with Crypto footer banner showcasing the playful nature of the Algorand memecoin';
   footerImg.className = 'footer-bg';
   footerImg.loading = 'lazy';
+  footerImg.decoding = 'async';
   
   const footer = document.createElement('footer');
   

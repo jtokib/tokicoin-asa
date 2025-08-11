@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="TokiCoin (TOKI) - A memecoin built on the Algorand blockchain. Completely pointless but built with purpose.">
-    <meta name="keywords" content="TokiCoin, TOKI, Algorand, ASA, memecoin, cryptocurrency, blockchain">
+    <meta name="description" content="TokiCoin (TOKI) - The official Algorand memecoin. Fast, secure, and completely pointless by design. Built as ASA on Algorand blockchain with 20M supply.">
+    <meta name="keywords" content="TokiCoin, TOKI, Algorand, ASA, memecoin, cryptocurrency, blockchain, algorand standard asset, meme token, crypto, defi">
     <meta name="author" content="TokiCoin Team">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <link rel="canonical" href="https://tokicoin.algo/">
     
     <!-- Security Headers -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://explorer.perawallet.app; frame-ancestors 'none'; base-uri 'self'; form-action 'none';">
@@ -22,18 +24,103 @@
     <link rel="manifest" href="/site.webmanifest" />
     
     <!-- Open Graph -->
-    <meta property="og:title" content="TokiCoin (TOKI) - The Algorand Memecoin">
-    <meta property="og:description" content="A memecoin built on Algorand blockchain as an ASA. Completely pointless by design.">
+    <meta property="og:title" content="TokiCoin (TOKI) - The Official Algorand Memecoin">
+    <meta property="og:description" content="The official Algorand memecoin built as ASA. Fast, secure, and completely pointless by design. 20M supply, $0.000001 initial price.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://tokicoin.algo">
+    <meta property="og:url" content="https://tokicoin.algo/">
+    <meta property="og:site_name" content="TokiCoin">
+    <meta property="og:image" content="https://tokicoin.algo/TokiCoin Adventures.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="TokiCoin Adventures - The Algorand Memecoin">
+    <meta property="og:locale" content="en_US">
     
     <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="TokiCoin (TOKI) - The Algorand Memecoin">
-    <meta name="twitter:description" content="A memecoin built on Algorand blockchain as an ASA. Completely pointless by design.">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="TokiCoin (TOKI) - The Official Algorand Memecoin">
+    <meta name="twitter:description" content="The official Algorand memecoin built as ASA. Fast, secure, and completely pointless by design. 20M supply, $0.000001 initial price.">
+    <meta name="twitter:image" content="https://tokicoin.algo/TokiCoin Adventures.webp">
+    <meta name="twitter:image:alt" content="TokiCoin Adventures - The Algorand Memecoin">
+    <meta name="twitter:site" content="@TokiCoin">
+    <meta name="twitter:creator" content="@TokiCoin">
     
-    <title>TokiCoin (TOKI) - The Algorand Memecoin</title>
+    <title>TokiCoin (TOKI) - The Official Algorand Memecoin</title>
     <link rel="icon" type="image/svg+xml" href="/tokicoin-favicon.svg">
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://tokicoin.algo/#organization",
+          "name": "TokiCoin",
+          "url": "https://tokicoin.algo/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://tokicoin.algo/tokicoin-favicon.svg",
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://tokicoin.algo/#website",
+          "url": "https://tokicoin.algo/",
+          "name": "TokiCoin",
+          "description": "The official Algorand memecoin. Fast, secure, and completely pointless by design.",
+          "publisher": {
+            "@id": "https://tokicoin.algo/#organization"
+          },
+          "inLanguage": "en-US"
+        },
+        {
+          "@type": "WebPage",
+          "@id": "https://tokicoin.algo/#webpage",
+          "url": "https://tokicoin.algo/",
+          "name": "TokiCoin (TOKI) - The Official Algorand Memecoin",
+          "isPartOf": {
+            "@id": "https://tokicoin.algo/#website"
+          },
+          "description": "The official Algorand memecoin built as ASA. Fast, secure, and completely pointless by design. 20M supply, $0.000001 initial price.",
+          "inLanguage": "en-US"
+        },
+        {
+          "@type": "FinancialProduct",
+          "name": "TokiCoin",
+          "alternateName": "TOKI",
+          "description": "A memecoin built on the Algorand blockchain as an Algorand Standard Asset (ASA)",
+          "category": "Cryptocurrency",
+          "provider": {
+            "@id": "https://tokicoin.algo/#organization"
+          },
+          "additionalProperty": [
+            {
+              "@type": "PropertyValue",
+              "name": "Total Supply",
+              "value": "20,000,000"
+            },
+            {
+              "@type": "PropertyValue",
+              "name": "Blockchain",
+              "value": "Algorand"
+            },
+            {
+              "@type": "PropertyValue",
+              "name": "Token Type",
+              "value": "ASA (Algorand Standard Asset)"
+            },
+            {
+              "@type": "PropertyValue",
+              "name": "Asset ID",
+              "value": "3145241720"
+            }
+          ]
+        }
+      ]
+    }
+    </script>
 </head>
 <body>
     <div id="app"></div>

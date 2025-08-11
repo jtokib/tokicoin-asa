@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" 
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url>
+    <loc>https://tokicoin.algo/</loc>
+    <lastmod>2025-01-11</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://tokicoin.algo/TokiCoin%20Adventures.webp</image:loc>
+      <image:caption>TokiCoin Adventures - The Official Algorand Memecoin</image:caption>
+      <image:title>TokiCoin Adventures</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://tokicoin.algo/TokiCoin%20%E2%80%93%20Fun%20with%20Crypto.webp</image:loc>
+      <image:caption>TokiCoin Fun with Crypto - Algorand ASA Token</image:caption>
+      <image:title>TokiCoin Fun with Crypto</image:title>
+    </image:image>
+  </url>
+</urlset>

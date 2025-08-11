@@ -80,6 +80,8 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-display: swap;
+  contain: layout style paint;
 }
 
 .header-wrapper {
@@ -103,6 +105,8 @@ body {
   z-index: 1;
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
+  will-change: opacity;
+  transform: translateZ(0); /* Force GPU acceleration */
 }
 
 .header-bg[loading="lazy"] {
@@ -135,6 +139,8 @@ body {
   z-index: 1;
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
+  will-change: opacity;
+  transform: translateZ(0); /* Force GPU acceleration */
 }
 
 .footer-bg[loading="lazy"] {

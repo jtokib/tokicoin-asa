@@ -1,0 +1,22 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://tokicoin.algo/sitemap.xml
+
+# Block common bot paths
+Disallow: /admin/
+Disallow: /api/
+Disallow: /*.json$
+Disallow: /*?*utm*
+Disallow: /*?*ref*
+
+# Crawl-delay for aggressive crawlers
+User-agent: MJ12bot
+Crawl-delay: 10
+
+User-agent: AhrefsBot
+Crawl-delay: 10
+
+User-agent: SemrushBot
+Crawl-delay: 10
